@@ -2,11 +2,19 @@
 /* tslint:disable */
 /* eslint-disable */
 export type { AggregatorV3Interface } from "./AggregatorV3Interface";
-export type { Greeter } from "./Greeter";
+export type { ERC20 } from "./ERC20";
+export type { IERC20Metadata } from "./IERC20Metadata";
 export type { IERC20 } from "./IERC20";
+export type { BoredApeToken } from "./BoredApeToken";
+export type { Greeter } from "./Greeter";
+export type { IERC721 } from "./IERC721";
 export type { TokenMarket } from "./TokenMarket";
 
 export { AggregatorV3Interface__factory } from "./factories/AggregatorV3Interface__factory";
-export { Greeter__factory } from "./factories/Greeter__factory";
+export { ERC20__factory } from "./factories/ERC20__factory";
+export { IERC20Metadata__factory } from "./factories/IERC20Metadata__factory";
 export { IERC20__factory } from "./factories/IERC20__factory";
+export { BoredApeToken__factory } from "./factories/BoredApeToken__factory";
+export { Greeter__factory } from "./factories/Greeter__factory";
+export { IERC721__factory } from "./factories/IERC721__factory";
 export { TokenMarket__factory } from "./factories/TokenMarket__factory";

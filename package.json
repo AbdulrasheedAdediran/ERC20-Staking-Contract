@@ -7,6 +7,7 @@
   "license": "MIT",
   "dependencies": {
     "@chainlink/contracts": "^0.4.0",
+    "@openzeppelin/contracts": "^4.5.0",
     "dotenv": "^10.0.0",
     "hardhat": "^2.9.1"
   },
