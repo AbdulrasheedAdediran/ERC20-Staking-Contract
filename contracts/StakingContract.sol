@@ -16,20 +16,32 @@ contract StakingContract{
        uint stakedAmount;
        uint stakeTime;
        uint stakeProfit;
-       bool stakeMaturity
+       bool stakeMaturity;
    }
-   uint stakeIndex = 1;
-   
+   uint internal stakeIndex = 1;
+   // Bored Ape Token Address
+   address internal batAddress;
+   // Bored Ape NFT Address
+   address internal baycAddress;
+
 mapping(address => Stake) public stakes;
 modifier OnlyBoredApeOwners(){
-    require(balanceOf(msg.sender) > 0, "Must own Bored Ape NFT to stake");
+    require(baycAddress.balanceOf(msg.sender) > 0, "Must own Bored Ape NFT to stake");
 
     _;
 }
 
 function stake(uint _amount) public pure OnlyBoredApeOwners{
-    Stake storage s = stakes[stakeIndex]
-    s.amount += _amount
+    Stake storage s = stakes[stakeIndex];
+    s.stakedAmount = _amount;
+    s.stakeTime = block.timestamp;
+    if(s.stakeTime = block.timestamp + 3 days){
+        s.stakeMaturity = true;
+    }
+    if(stakeMaturity){
+    s.stakeProfit = (s.stakedAmount/100) * 10; 
+    }
+stakeIndex++
 }
 
 }
