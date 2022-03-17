@@ -29,15 +29,18 @@ contract StakingContract{
         batAddress = _batAddress; 
     }
    struct Stake{
-       uint stakedAmount;
+       uint[] stakes;
        uint stakeTime;
-       uint stakeProfit;
+       uint stakedBalance;
        bool stakeMaturity;
+       uint stakeProfit;
    }
-uint stakeIndex = 1;
+uint stakeIndex = 0;
+uint maturityPeriod = 3 minutes;
+uint interestRate = 10;
 address baycAddress = 0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D;
 IERC721 boredApeYatchToken = IERC721(baycAddress);
-mapping(address => mapping(uint => Stake)) public stakes;
+mapping(address => mapping(uint => Stake)) public addressStakesToIndex;
 modifier OnlyBoredApeOwners(){
     require(boredApeYatchToken.balanceOf(msg.sender) > 0, "Must own Bored Ape NFT to stake");
 
@@ -45,14 +48,18 @@ modifier OnlyBoredApeOwners(){
 }
 
 function stake(uint _amount) public OnlyBoredApeOwners{
-    Stake storage s = stakes[msg.sender][stakeIndex];
-    s.stakedAmount = _amount;
+    Stake storage s = addressStakesToIndex[msg.sender][stakeIndex];
     s.stakeTime = block.timestamp;
-    if(s.stakeTime == block.timestamp + 3 minutes){
+    s.stakes = s.stakes.push(_amount);
+    for(uint i = 0, i < s.stakes.length, i++){
+        s.stakedBalance += s.stakes[i];
+    }
+    if(s.stakeTime == s.stakeTime + maturityPeriod){
         s.stakeMaturity = true;
     }
     if(s.stakeMaturity){
-    s.stakeProfit = (s.stakedAmount/100) * 10; 
+    s.stakeProfit = (s.stakedBalance/100) * interestRate; 
+    s.stakedBalance += s.stakeProfit;
     }
 stakeIndex++;
 }
