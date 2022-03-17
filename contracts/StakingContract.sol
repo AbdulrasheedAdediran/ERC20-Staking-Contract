@@ -63,6 +63,7 @@ function stake(uint _amount) public OnlyBoredApeOwners{
     s.stakedBalance += s.stakeProfit;
     }
 stakeIndex++;
+s.stakematurity = false;
 }
 
 }
