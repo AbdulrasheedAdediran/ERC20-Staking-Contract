@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.4;
 
-
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 contract StakingContract{
 
@@ -20,12 +22,11 @@ contract StakingContract{
 
 
    // Bored Apes Token Address
-   address internal batAddress;
+   address batAddress;
    // Bored Apes Yatch Club NFT Address
-   address internal baycAddress;
-    constructor(address _batAddress, address _baycAddress){
-        batAddress = _batAddress;
-        baycAddress = _baycAddress; 
+
+    constructor(address _batAddress){
+        batAddress = _batAddress; 
     }
    struct Stake{
        uint stakedAmount;
@@ -33,11 +34,12 @@ contract StakingContract{
        uint stakeProfit;
        bool stakeMaturity;
    }
-   uint internal stakeIndex = 1;
-
+uint stakeIndex = 1;
+address baycAddress = 0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D;
+IERC721 boredApeYatchToken = IERC721(baycAddress);
 mapping(address => mapping(uint => Stake)) public stakes;
 modifier OnlyBoredApeOwners(){
-    require(baycAddress.balanceOf(msg.sender) > 0, "Must own Bored Ape NFT to stake");
+    require(boredApeYatchToken.balanceOf(msg.sender) > 0, "Must own Bored Ape NFT to stake");
 
     _;
 }
