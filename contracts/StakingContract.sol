@@ -48,6 +48,7 @@ modifier OnlyBoredApeOwners(){
 }
 
 function stake(uint _amount) public OnlyBoredApeOwners{
+    require(batAddress.balanceOf(msg.sender) >= _amount, "Amount exceeds balance")
     Stake storage s = addressStakesToIndex[msg.sender][stakeIndex];
     s.stakeTime = block.timestamp;
     s.stakes = s.stakes.push(_amount);
