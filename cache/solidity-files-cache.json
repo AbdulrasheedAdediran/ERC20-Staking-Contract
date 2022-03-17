@@ -181,8 +181,8 @@
       ]
     },
     "C:\\Users\\HP\\Desktop\\Dev\\ERC20-Staking-Contract\\contracts\\BoredApeToken.sol": {
-      "lastModificationDate": 1647465293428,
-      "contentHash": "f9ca3fac28918e662207800685b94c13",
+      "lastModificationDate": 1647481173428,
+      "contentHash": "708fa10060bcef69defdde075487560d",
       "sourceName": "contracts/BoredApeToken.sol",
       "solcConfig": {
         "version": "0.8.4",
