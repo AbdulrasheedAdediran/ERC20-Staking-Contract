@@ -7,7 +7,7 @@ async function deployContract() {
     await bored_ape_token.deployed();
 
     console.log("BAT Contract Address:", bored_ape_token.address);
-    // BAT Contract Address: 0x40a42Baf86Fc821f972Ad2aC878729063CeEF403
+    // BAT Contract Address Rinkeby: 0x234d11e2382C47283FBBBE42835676058009BF18
     
 
 

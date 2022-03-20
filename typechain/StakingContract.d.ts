@@ -21,21 +21,42 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface StakingContractInterface extends ethers.utils.Interface {
   functions: {
-    "addressStakesToIndex(address,uint256)": FunctionFragment;
+    "addressStakes(address)": FunctionFragment;
     "stake(uint256)": FunctionFragment;
+    "viewStakeBalance()": FunctionFragment;
+    "viewStakes()": FunctionFragment;
+    "withdraw(uint256)": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "addressStakesToIndex",
-    values: [string, BigNumberish]
+    functionFragment: "addressStakes",
+    values: [string]
   ): string;
   encodeFunctionData(functionFragment: "stake", values: [BigNumberish]): string;
+  encodeFunctionData(
+    functionFragment: "viewStakeBalance",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "viewStakes",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "withdraw",
+    values: [BigNumberish]
+  ): string;
 
   decodeFunctionResult(
-    functionFragment: "addressStakesToIndex",
+    functionFragment: "addressStakes",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "stake", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "viewStakeBalance",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "viewStakes", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {};
 }
@@ -84,16 +105,15 @@ export class StakingContract extends BaseContract {
   interface: StakingContractInterface;
 
   functions: {
-    addressStakesToIndex(
+    addressStakes(
       arg0: string,
-      arg1: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, boolean, BigNumber] & {
+      [BigNumber, BigNumber, BigNumber, boolean] & {
         stakeTime: BigNumber;
         stakedBalance: BigNumber;
-        stakeMaturity: boolean;
         stakeProfit: BigNumber;
+        stakeMaturity: boolean;
       }
     >;
 
@@ -101,18 +121,30 @@ export class StakingContract extends BaseContract {
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    viewStakeBalance(
+      overrides?: CallOverrides
+    ): Promise<[BigNumber] & { _balance: BigNumber }>;
+
+    viewStakes(
+      overrides?: CallOverrides
+    ): Promise<[BigNumber[]] & { _stakes: BigNumber[] }>;
+
+    withdraw(
+      _amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
   };
 
-  addressStakesToIndex(
+  addressStakes(
     arg0: string,
-    arg1: BigNumberish,
     overrides?: CallOverrides
   ): Promise<
-    [BigNumber, BigNumber, boolean, BigNumber] & {
+    [BigNumber, BigNumber, BigNumber, boolean] & {
       stakeTime: BigNumber;
       stakedBalance: BigNumber;
-      stakeMaturity: boolean;
       stakeProfit: BigNumber;
+      stakeMaturity: boolean;
     }
   >;
 
@@ -121,46 +153,76 @@ export class StakingContract extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  viewStakeBalance(overrides?: CallOverrides): Promise<BigNumber>;
+
+  viewStakes(overrides?: CallOverrides): Promise<BigNumber[]>;
+
+  withdraw(
+    _amount: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   callStatic: {
-    addressStakesToIndex(
+    addressStakes(
       arg0: string,
-      arg1: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, boolean, BigNumber] & {
+      [BigNumber, BigNumber, BigNumber, boolean] & {
         stakeTime: BigNumber;
         stakedBalance: BigNumber;
-        stakeMaturity: boolean;
         stakeProfit: BigNumber;
+        stakeMaturity: boolean;
       }
     >;
 
     stake(_amount: BigNumberish, overrides?: CallOverrides): Promise<void>;
+
+    viewStakeBalance(overrides?: CallOverrides): Promise<BigNumber>;
+
+    viewStakes(overrides?: CallOverrides): Promise<BigNumber[]>;
+
+    withdraw(
+      _amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
   };
 
   filters: {};
 
   estimateGas: {
-    addressStakesToIndex(
-      arg0: string,
-      arg1: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    addressStakes(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     stake(
+      _amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    viewStakeBalance(overrides?: CallOverrides): Promise<BigNumber>;
+
+    viewStakes(overrides?: CallOverrides): Promise<BigNumber>;
+
+    withdraw(
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    addressStakesToIndex(
+    addressStakes(
       arg0: string,
-      arg1: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     stake(
+      _amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    viewStakeBalance(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    viewStakes(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    withdraw(
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;

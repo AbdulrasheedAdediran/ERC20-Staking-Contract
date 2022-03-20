@@ -23,12 +23,12 @@ uint maturityPeriod;
 
 constructor(uint _maturityPeriod, uint _interestInPercent){
     maturityPeriod = _maturityPeriod;
-    interestInPercent = _interestInPercent
+    interestInPercent = _interestInPercent;
 }
 
 // Bored Apes Token Address
 IERC20 boredApeToken = IERC20(batAddress);
-address batAddress = 0x40a42Baf86Fc821f972Ad2aC878729063CeEF403;
+address batAddress = 0x234d11e2382C47283FBBBE42835676058009BF18;
 
 // Bored Apes Yatch Club NFT Address
 IERC721 boredApeYatchToken = IERC721(baycAddress);
@@ -36,17 +36,20 @@ address baycAddress = 0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D;
 
 mapping(address => Stake) public addressStakes;
 
-modifier OnlyBoredApeOwners(){
+modifier onlyBoredApeOwners(){
     require(boredApeYatchToken.balanceOf(msg.sender) > 0, "Must own Bored Ape NFT to stake");
-
+    _;
+}
+modifier onlyStakers(){
+    Stake storage s = addressStakes[msg.sender];
+    require(s.stakes.length > 0, "No stakes found");
     _;
 }
 
-function stake(uint _amount) public OnlyBoredApeOwners{
+function stake(uint _amount) public onlyBoredApeOwners{
     require(boredApeToken.balanceOf(msg.sender) >= _amount, "Amount exceeds balance");
     Stake storage s = addressStakes[msg.sender];
     boredApeToken.transferFrom(msg.sender, address(this), _amount);
-    boredApeToken.balance(msg.sender) -= _amount;
     s.stakes.push(_amount);
     
     if(s.stakeTime > 0 && block.timestamp >= s.stakeTime + maturityPeriod){
@@ -65,17 +68,20 @@ stakeIndex++;
 s.stakeTime = block.timestamp;
 s.stakeMaturity = false;
 }
-}
 
-function viewStakes() public view returns(uint[] _stakes){
+
+function viewStakes() public view onlyStakers returns(uint[] memory _stakes){
     Stake storage s = addressStakes[msg.sender];
-    require(s.stakes.length > 0, "No stakes found");
         _stakes = s.stakes;
 }
 
-function withdraw(uint _amount) public returns(bool success){
+function viewStakeBalance() public view onlyStakers returns(uint _balance){
+    Stake storage s = addressStakes[msg.sender];
+    _balance = s.stakedBalance;
+} 
+
+function withdraw(uint _amount) public onlyStakers returns(bool success){
     require(boredApeToken.balanceOf(msg.sender) >= _amount, "Amount exceeds balance");
-    msg.sender.balance += _amount;
     boredApeToken.transferFrom(address(this), msg.sender, _amount);
     success = true;
 }
