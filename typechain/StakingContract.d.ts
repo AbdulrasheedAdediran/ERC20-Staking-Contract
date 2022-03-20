@@ -21,18 +21,21 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface StakingContractInterface extends ethers.utils.Interface {
   functions: {
+    "addressStakesToIndex(address,uint256)": FunctionFragment;
     "stake(uint256)": FunctionFragment;
-    "stakes(address,uint256)": FunctionFragment;
   };
 
-  encodeFunctionData(functionFragment: "stake", values: [BigNumberish]): string;
   encodeFunctionData(
-    functionFragment: "stakes",
+    functionFragment: "addressStakesToIndex",
     values: [string, BigNumberish]
   ): string;
+  encodeFunctionData(functionFragment: "stake", values: [BigNumberish]): string;
 
+  decodeFunctionResult(
+    functionFragment: "addressStakesToIndex",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "stake", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "stakes", data: BytesLike): Result;
 
   events: {};
 }
@@ -81,85 +84,85 @@ export class StakingContract extends BaseContract {
   interface: StakingContractInterface;
 
   functions: {
-    stake(
-      _amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    stakes(
+    addressStakesToIndex(
       arg0: string,
       arg1: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber, boolean] & {
-        stakedAmount: BigNumber;
+      [BigNumber, BigNumber, boolean, BigNumber] & {
         stakeTime: BigNumber;
-        stakeProfit: BigNumber;
+        stakedBalance: BigNumber;
         stakeMaturity: boolean;
+        stakeProfit: BigNumber;
       }
     >;
+
+    stake(
+      _amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
   };
+
+  addressStakesToIndex(
+    arg0: string,
+    arg1: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<
+    [BigNumber, BigNumber, boolean, BigNumber] & {
+      stakeTime: BigNumber;
+      stakedBalance: BigNumber;
+      stakeMaturity: boolean;
+      stakeProfit: BigNumber;
+    }
+  >;
 
   stake(
     _amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  stakes(
-    arg0: string,
-    arg1: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<
-    [BigNumber, BigNumber, BigNumber, boolean] & {
-      stakedAmount: BigNumber;
-      stakeTime: BigNumber;
-      stakeProfit: BigNumber;
-      stakeMaturity: boolean;
-    }
-  >;
-
   callStatic: {
-    stake(_amount: BigNumberish, overrides?: CallOverrides): Promise<void>;
-
-    stakes(
+    addressStakesToIndex(
       arg0: string,
       arg1: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber, boolean] & {
-        stakedAmount: BigNumber;
+      [BigNumber, BigNumber, boolean, BigNumber] & {
         stakeTime: BigNumber;
-        stakeProfit: BigNumber;
+        stakedBalance: BigNumber;
         stakeMaturity: boolean;
+        stakeProfit: BigNumber;
       }
     >;
+
+    stake(_amount: BigNumberish, overrides?: CallOverrides): Promise<void>;
   };
 
   filters: {};
 
   estimateGas: {
-    stake(
-      _amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    stakes(
+    addressStakesToIndex(
       arg0: string,
       arg1: BigNumberish,
       overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    stake(
+      _amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    stake(
-      _amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    stakes(
+    addressStakesToIndex(
       arg0: string,
       arg1: BigNumberish,
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    stake(
+      _amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };
 }

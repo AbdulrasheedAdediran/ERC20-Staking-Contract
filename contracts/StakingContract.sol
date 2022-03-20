@@ -2,45 +2,40 @@
 pragma solidity 0.8.4;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 contract StakingContract{
-
-// Staking contract that allows Bored Ape NFT owners to stake BAT(ERC20) for 10% profit monthly
-    // Must own Bored Ape NFT to qualify for staking
-    // Must have BAT to qualify for staking
-    // Get 10% profit if staking conditions are satisfied 
-    // Must have staked for at least 3 days to get 10% profit 
-    // Can only get 10% profit once in a month (30 days)
-
-
-    // map each address to stake index to staked amount
-    // increament profit daily for each stake/index
-    // collect each stake and pull together at month end and restake profit and stakes if amount is not withdrawn
-    // withdrawal should be from first stakes (first in first out approach)
-
-
-   // Bored Apes Token Address
-   address batAddress;
-   // Bored Apes Yatch Club NFT Address
-
-    constructor(address _batAddress){
-        batAddress = _batAddress; 
-    }
+    
    struct Stake{
        uint[] stakes;
        uint stakeTime;
        uint stakedBalance;
-       bool stakeMaturity;
        uint stakeProfit;
+       bool stakeMaturity;
    }
-uint stakeIndex = 0;
-uint maturityPeriod = 3 minutes;
-uint interestRate = 10;
-address baycAddress = 0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D;
+uint stakeIndex = 1;
+// Interest user gains after stake has matured
+uint interestInPercent;
+// Time before user can gain interest 
+uint maturityPeriod; 
+
+constructor(uint _maturityPeriod, uint _interestInPercent){
+    maturityPeriod = _maturityPeriod;
+    interestInPercent = _interestInPercent
+}
+
+// Bored Apes Token Address
+IERC20 boredApeToken = IERC20(batAddress);
+address batAddress = 0x40a42Baf86Fc821f972Ad2aC878729063CeEF403;
+
+// Bored Apes Yatch Club NFT Address
 IERC721 boredApeYatchToken = IERC721(baycAddress);
-mapping(address => mapping(uint => Stake)) public addressStakesToIndex;
+address baycAddress = 0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D;
+
+mapping(address => Stake) public addressStakes;
+
 modifier OnlyBoredApeOwners(){
     require(boredApeYatchToken.balanceOf(msg.sender) > 0, "Must own Bored Ape NFT to stake");
 
@@ -48,22 +43,40 @@ modifier OnlyBoredApeOwners(){
 }
 
 function stake(uint _amount) public OnlyBoredApeOwners{
-    require(batAddress.balanceOf(msg.sender) >= _amount, "Amount exceeds balance")
-    Stake storage s = addressStakesToIndex[msg.sender][stakeIndex];
-    s.stakeTime = block.timestamp;
-    s.stakes = s.stakes.push(_amount);
-    for(uint i = 0, i < s.stakes.length, i++){
-        s.stakedBalance += s.stakes[i];
-    }
-    if(s.stakeTime == s.stakeTime + maturityPeriod){
+    require(boredApeToken.balanceOf(msg.sender) >= _amount, "Amount exceeds balance");
+    Stake storage s = addressStakes[msg.sender];
+    boredApeToken.transferFrom(msg.sender, address(this), _amount);
+    boredApeToken.balance(msg.sender) -= _amount;
+    s.stakes.push(_amount);
+    
+    if(s.stakeTime > 0 && block.timestamp >= s.stakeTime + maturityPeriod){
         s.stakeMaturity = true;
     }
     if(s.stakeMaturity){
-    s.stakeProfit = (s.stakedBalance/100) * interestRate; 
-    s.stakedBalance += s.stakeProfit;
+        uint timeAfterMaturity = block.timestamp - (s.stakeTime + maturityPeriod);
+        uint cycles = timeAfterMaturity / maturityPeriod;
+        s.stakeProfit = (s.stakedBalance + (interestInPercent * cycles)) / 100; 
+        s.stakedBalance += s.stakeProfit;
     }
+        s.stakedBalance += _amount;
+
+
 stakeIndex++;
-s.stakematurity = false;
+s.stakeTime = block.timestamp;
+s.stakeMaturity = false;
+}
 }
 
+function viewStakes() public view returns(uint[] _stakes){
+    Stake storage s = addressStakes[msg.sender];
+    require(s.stakes.length > 0, "No stakes found");
+        _stakes = s.stakes;
+}
+
+function withdraw(uint _amount) public returns(bool success){
+    require(boredApeToken.balanceOf(msg.sender) >= _amount, "Amount exceeds balance");
+    msg.sender.balance += _amount;
+    boredApeToken.transferFrom(address(this), msg.sender, _amount);
+    success = true;
+}
 }

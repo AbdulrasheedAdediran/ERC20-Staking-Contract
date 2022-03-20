@@ -436,8 +436,8 @@
       ]
     },
     "C:\\Users\\HP\\Desktop\\Dev\\ERC20-Staking-Contract\\contracts\\StakingContract.sol": {
-      "lastModificationDate": 1647528577392,
-      "contentHash": "a81dab7aadca05b84bb94533b2d104c1",
+      "lastModificationDate": 1647538644855,
+      "contentHash": "94749647f50034d58b48e66ce07506ee",
       "sourceName": "contracts/StakingContract.sol",
       "solcConfig": {
         "version": "0.8.4",
@@ -464,6 +464,7 @@
       },
       "imports": [
         "@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
         "@openzeppelin/contracts/token/ERC721/ERC721.sol",
         "@openzeppelin/contracts/token/ERC721/IERC721.sol"
       ],
