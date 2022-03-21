@@ -19,7 +19,7 @@ uint stakeIndex = 1;
 // Interest user gains after stake has matured
 uint interestInPercent;
 // Time before user can gain interest 
-uint maturityPeriod; 
+uint maturityPeriod = 5 minutes; 
 // Bored Apes Yatch Club NFT Address
 address baycAddress = 0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D;
 IERC20 boredApeToken;
@@ -29,8 +29,7 @@ IERC721 BoredApeYachtClub;
 mapping(address => Stake) public addressStakes;
 event tokenTransfer(address _from, address _to, uint _amount);
 
-constructor(uint _maturityPeriod, uint _interestInPercent){
-    maturityPeriod = _maturityPeriod;
+constructor(uint _interestInPercent){
     interestInPercent = _interestInPercent;
     boredApeToken = IERC20(batAddress);
     BoredApeYachtClub = IERC721(baycAddress);
@@ -64,10 +63,10 @@ function stake(uint _amount) public onlyBoredApeOwners{
         s.stakedBalance += _amount;
 
     emit tokenTransfer(msg.sender, address(this), _amount);
-stakeIndex++;
-s.stakeTime = block.timestamp;
-s.stakeMaturity = false;
-}
+        stakeIndex++;
+        s.stakeTime = block.timestamp;
+        s.stakeMaturity = false;
+        }
 
 
 function viewStakes() public view onlyStakers returns(uint[] memory _stakes){
@@ -81,8 +80,12 @@ function viewStakeBalance() public view onlyStakers returns(uint _balance){
 } 
 
 function withdraw(uint _amount) public onlyStakers returns(bool success){
-    require(boredApeToken.balanceOf(msg.sender) >= _amount, "Amount exceeds balance");
-    boredApeToken.transferFrom(address(this), msg.sender, _amount);
+    Stake storage s = addressStakes[msg.sender];
+    require(s.stakeMaturity = true, "Stake is not mature for withdrawal");
+    require(s.stakedBalance >= _amount, "Amount exceeds balance");
+    s.stakedBalance -= _amount;
+    boredApeToken.transfer(msg.sender, _amount);
     success = true;
+    emit tokenTransfer(address(this), msg.sender, _amount);
 }
 }
