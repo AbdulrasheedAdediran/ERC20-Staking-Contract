@@ -436,8 +436,8 @@
       ]
     },
     "C:\\Users\\HP\\Desktop\\Dev\\ERC20-Staking-Contract\\contracts\\StakingContract.sol": {
-      "lastModificationDate": 1647820486116,
-      "contentHash": "41afd5a49ddf867d1ae71b152b2a8ef2",
+      "lastModificationDate": 1647829902252,
+      "contentHash": "d941c5f9d74f62bcd5c34ef417a0b10b",
       "sourceName": "contracts/StakingContract.sol",
       "solcConfig": {
         "version": "0.8.4",

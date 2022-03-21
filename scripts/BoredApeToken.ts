@@ -8,6 +8,7 @@ async function deployContract() {
 
     console.log("BAT Contract Address:", bored_ape_token.address);
     // BAT Contract Address Rinkeby: 0x234d11e2382C47283FBBBE42835676058009BF18
+    // Forked Mainnet Address: 0x96F3Ce39Ad2BfDCf92C0F6E2C2CAbF83874660Fc
     
 
 

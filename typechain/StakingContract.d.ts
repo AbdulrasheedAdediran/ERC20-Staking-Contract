@@ -58,8 +58,20 @@ interface StakingContractInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "viewStakes", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
-  events: {};
+  events: {
+    "tokenTransfer(address,address,uint256)": EventFragment;
+  };
+
+  getEvent(nameOrSignatureOrTopic: "tokenTransfer"): EventFragment;
 }
+
+export type tokenTransferEvent = TypedEvent<
+  [string, string, BigNumber] & {
+    _from: string;
+    _to: string;
+    _amount: BigNumber;
+  }
+>;
 
 export class StakingContract extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
@@ -187,7 +199,25 @@ export class StakingContract extends BaseContract {
     ): Promise<boolean>;
   };
 
-  filters: {};
+  filters: {
+    "tokenTransfer(address,address,uint256)"(
+      _from?: null,
+      _to?: null,
+      _amount?: null
+    ): TypedEventFilter<
+      [string, string, BigNumber],
+      { _from: string; _to: string; _amount: BigNumber }
+    >;
+
+    tokenTransfer(
+      _from?: null,
+      _to?: null,
+      _amount?: null
+    ): TypedEventFilter<
+      [string, string, BigNumber],
+      { _from: string; _to: string; _amount: BigNumber }
+    >;
+  };
 
   estimateGas: {
     addressStakes(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;

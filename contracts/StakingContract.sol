@@ -20,24 +20,24 @@ uint stakeIndex = 1;
 uint interestInPercent;
 // Time before user can gain interest 
 uint maturityPeriod; 
+// Bored Apes Yatch Club NFT Address
+address baycAddress = 0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D;
+IERC20 boredApeToken;
+// Bored Apes Token Address
+address batAddress = 0x96F3Ce39Ad2BfDCf92C0F6E2C2CAbF83874660Fc;
+IERC721 BoredApeYachtClub;
+mapping(address => Stake) public addressStakes;
+event tokenTransfer(address _from, address _to, uint _amount);
 
 constructor(uint _maturityPeriod, uint _interestInPercent){
     maturityPeriod = _maturityPeriod;
     interestInPercent = _interestInPercent;
+    boredApeToken = IERC20(batAddress);
+    BoredApeYachtClub = IERC721(baycAddress);
 }
 
-// Bored Apes Token Address
-IERC20 boredApeToken = IERC20(batAddress);
-address batAddress = 0x234d11e2382C47283FBBBE42835676058009BF18;
-
-// Bored Apes Yatch Club NFT Address
-IERC721 boredApeYatchToken = IERC721(baycAddress);
-address baycAddress = 0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D;
-
-mapping(address => Stake) public addressStakes;
-
 modifier onlyBoredApeOwners(){
-    require(boredApeYatchToken.balanceOf(msg.sender) > 0, "Must own Bored Ape NFT to stake");
+    require(BoredApeYachtClub.balanceOf(msg.sender) > 0, "Must own Bored Ape NFT to stake");
     _;
 }
 modifier onlyStakers(){
@@ -63,7 +63,7 @@ function stake(uint _amount) public onlyBoredApeOwners{
     }
         s.stakedBalance += _amount;
 
-
+    emit tokenTransfer(msg.sender, address(this), _amount);
 stakeIndex++;
 s.stakeTime = block.timestamp;
 s.stakeMaturity = false;
