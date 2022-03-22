@@ -16,15 +16,15 @@ contract StakingContract{
        bool stakeMaturity;
    }
 uint stakeIndex = 1;
-// Interest user gains after stake has matured
+// Interest rate of gains after stake has matured
 uint interestInPercent;
-// Time before user can gain interest 
+// Time before user can gain interest on stakes 
 uint maturityPeriod = 5 minutes; 
 // Bored Apes Yatch Club NFT Address
 address baycAddress = 0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D;
-IERC20 boredApeToken;
 // Bored Apes Token Address
 address batAddress = 0x96F3Ce39Ad2BfDCf92C0F6E2C2CAbF83874660Fc;
+IERC20 boredApeToken;
 IERC721 BoredApeYachtClub;
 mapping(address => Stake) public addressStakes;
 event tokenTransfer(address _from, address _to, uint _amount);
@@ -81,7 +81,15 @@ function viewStakeBalance() public view onlyStakers returns(uint _balance){
 
 function withdraw(uint _amount) public onlyStakers returns(bool success){
     Stake storage s = addressStakes[msg.sender];
-    require(s.stakeMaturity = true, "Stake is not mature for withdrawal");
+     if(s.stakeTime > 0 && block.timestamp >= s.stakeTime + maturityPeriod){
+        s.stakeMaturity = true;
+    }
+    if(s.stakeMaturity){
+        uint timeAfterMaturity = block.timestamp - (s.stakeTime + maturityPeriod);
+        uint cycles = timeAfterMaturity / maturityPeriod;
+        s.stakeProfit = (s.stakedBalance + (interestInPercent * cycles)) / 100; 
+        s.stakedBalance += s.stakeProfit;
+    }
     require(s.stakedBalance >= _amount, "Amount exceeds balance");
     s.stakedBalance -= _amount;
     boredApeToken.transfer(msg.sender, _amount);
