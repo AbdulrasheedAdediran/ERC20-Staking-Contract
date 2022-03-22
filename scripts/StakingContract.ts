@@ -12,7 +12,7 @@ const interestInPercent = 10;
   const BAYC_Address = "0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D";
   const BoredApeToken = await ethers.getContractAt("BoredApeToken", BAT_Address);
   const BoredApeYachtClub = await ethers.getContractAt("contracts/IERC721.sol:IERC721", BAYC_Address);
-  const StakingContractAddress = "0x66F625B8c4c635af8b74ECe2d7eD0D58b4af3C3d"
+  const StakingContractAddress = "0xefAB0Beb0A557E452b398035eA964948c750b2Fd"
   const amountIn = 50000000;
   
   console.log("BAT Contract Address:", BoredApeToken.address);
@@ -24,7 +24,7 @@ const interestInPercent = 10;
   // await staking_contract.deployed();
   
   console.log("Staking Contract Address:", StakingContract.address);
-  // Staking Contract Address: 0x66F625B8c4c635af8b74ECe2d7eD0D58b4af3C3d
+  // Staking Contract Address: 0xefAB0Beb0A557E452b398035eA964948c750b2Fd
   
   console.log("Deployer's BAT Balance: ", await BoredApeToken.balanceOf(deployer.address));
   // console.log(`My BAT mainnet balance is ${await ethers.provider.getBalance(deployer.address)}`);
@@ -52,12 +52,12 @@ const interestInPercent = 10;
   // console.log(`Pranked User Staking 10000000 ${await StakingContract.connect(signer).stake(10000000)}`);
   
   
-  // console.log(`Pranked User's BAT Balance After Stake: ${await BoredApeToken.balanceOf(BAYC_Holder)}`)
-  // console.log(`Pranked User's Stakes: ${await StakingContract.connect(signer).viewStakes()}`);
+  console.log(`Pranked User's BAT Balance After Stake: ${await BoredApeToken.balanceOf(BAYC_Holder)}`)
+  console.log(`Pranked User's Stakes: ${await StakingContract.connect(signer).viewStakes()}`);
   
   console.log(`Pranked user's Stake Balance: ${await StakingContract.connect(signer).viewStakeBalance()}`)
   
-  await network.provider.send("evm_increaseTime", [180]);
+  await ethers.provider.send("evm_increaseTime", [600]);
   
   // console.log(`Withdrawing 10000000: ${await StakingContract.connect(signer).withdraw(10000000)}`);
   

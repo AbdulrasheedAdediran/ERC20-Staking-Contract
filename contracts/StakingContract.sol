@@ -81,15 +81,7 @@ function viewStakeBalance() public view onlyStakers returns(uint _balance){
 
 function withdraw(uint _amount) public onlyStakers returns(bool success){
     Stake storage s = addressStakes[msg.sender];
-     if(s.stakeTime > 0 && block.timestamp >= s.stakeTime + maturityPeriod){
-        s.stakeMaturity = true;
-    }
-    if(s.stakeMaturity){
-        uint timeAfterMaturity = block.timestamp - (s.stakeTime + maturityPeriod);
-        uint cycles = timeAfterMaturity / maturityPeriod;
-        s.stakeProfit = (s.stakedBalance + (interestInPercent * cycles)) / 100; 
-        s.stakedBalance += s.stakeProfit;
-    }
+    require(s.stakeMaturity = true, "Stake is not mature for withdrawal");
     require(s.stakedBalance >= _amount, "Amount exceeds balance");
     s.stakedBalance -= _amount;
     boredApeToken.transfer(msg.sender, _amount);
