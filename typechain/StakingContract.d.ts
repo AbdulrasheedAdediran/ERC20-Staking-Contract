@@ -24,7 +24,7 @@ interface StakingContractInterface extends ethers.utils.Interface {
     "addressStakes(address)": FunctionFragment;
     "stake(uint256)": FunctionFragment;
     "viewStakeBalance()": FunctionFragment;
-    "viewStakes()": FunctionFragment;
+    "viewStakeHistory()": FunctionFragment;
     "withdraw(uint256)": FunctionFragment;
   };
 
@@ -38,7 +38,7 @@ interface StakingContractInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "viewStakes",
+    functionFragment: "viewStakeHistory",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -55,7 +55,10 @@ interface StakingContractInterface extends ethers.utils.Interface {
     functionFragment: "viewStakeBalance",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "viewStakes", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "viewStakeHistory",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {
@@ -138,7 +141,7 @@ export class StakingContract extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[BigNumber] & { _balance: BigNumber }>;
 
-    viewStakes(
+    viewStakeHistory(
       overrides?: CallOverrides
     ): Promise<[BigNumber[]] & { _stakes: BigNumber[] }>;
 
@@ -167,7 +170,7 @@ export class StakingContract extends BaseContract {
 
   viewStakeBalance(overrides?: CallOverrides): Promise<BigNumber>;
 
-  viewStakes(overrides?: CallOverrides): Promise<BigNumber[]>;
+  viewStakeHistory(overrides?: CallOverrides): Promise<BigNumber[]>;
 
   withdraw(
     _amount: BigNumberish,
@@ -191,7 +194,7 @@ export class StakingContract extends BaseContract {
 
     viewStakeBalance(overrides?: CallOverrides): Promise<BigNumber>;
 
-    viewStakes(overrides?: CallOverrides): Promise<BigNumber[]>;
+    viewStakeHistory(overrides?: CallOverrides): Promise<BigNumber[]>;
 
     withdraw(
       _amount: BigNumberish,
@@ -229,7 +232,7 @@ export class StakingContract extends BaseContract {
 
     viewStakeBalance(overrides?: CallOverrides): Promise<BigNumber>;
 
-    viewStakes(overrides?: CallOverrides): Promise<BigNumber>;
+    viewStakeHistory(overrides?: CallOverrides): Promise<BigNumber>;
 
     withdraw(
       _amount: BigNumberish,
@@ -250,7 +253,7 @@ export class StakingContract extends BaseContract {
 
     viewStakeBalance(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    viewStakes(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    viewStakeHistory(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     withdraw(
       _amount: BigNumberish,

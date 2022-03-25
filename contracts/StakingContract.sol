@@ -36,21 +36,20 @@ constructor(uint _interestInPercent){
 }
 
 modifier onlyBoredApeOwners(){
-    require(BoredApeYachtClub.balanceOf(msg.sender) > 0, "Must own Bored Ape NFT to stake");
+    require(BoredApeYachtClub.balanceOf(msg.sender) > 0, "Sorry, you must own Bored Ape NFT to stake");
     _;
 }
 modifier onlyStakers(){
     Stake storage s = addressStakes[msg.sender];
-    require(s.stakes.length > 0, "No stakes found");
+    require(s.stakes.length > 0, "You have no stakes in this pool");
     _;
 }
 
 function stake(uint _amount) public onlyBoredApeOwners{
-    require(boredApeToken.balanceOf(msg.sender) >= _amount, "Amount exceeds balance");
+    require(boredApeToken.balanceOf(msg.sender) >= _amount, "Amount exceeds BAT balance");
     Stake storage s = addressStakes[msg.sender];
     boredApeToken.transferFrom(msg.sender, address(this), _amount);
     s.stakes.push(_amount);
-    
     if(s.stakeTime > 0 && block.timestamp >= s.stakeTime + maturityPeriod){
         s.stakeMaturity = true;
     }
@@ -69,20 +68,30 @@ function stake(uint _amount) public onlyBoredApeOwners{
         }
 
 
-function viewStakes() public view onlyStakers returns(uint[] memory _stakes){
+function viewStakeHistory() public view onlyStakers returns(uint[] memory _stakes){
     Stake storage s = addressStakes[msg.sender];
         _stakes = s.stakes;
 }
 
 function viewStakeBalance() public view onlyStakers returns(uint _balance){
     Stake storage s = addressStakes[msg.sender];
-    _balance = s.stakedBalance;
+    _balance = s.stakedBalance + s.stakeProfit;
 } 
 
 function withdraw(uint _amount) public onlyStakers returns(bool success){
     Stake storage s = addressStakes[msg.sender];
-    require(s.stakeMaturity = true, "Stake is not mature for withdrawal");
-    require(s.stakedBalance >= _amount, "Amount exceeds balance");
+    // require(s.stakeMaturity = true, "Stake is not mature for withdrawal");
+     if(s.stakeTime > 0 && block.timestamp >= s.stakeTime + maturityPeriod){
+        s.stakeMaturity = true;
+    }
+    if(s.stakeMaturity){
+        uint timeAfterMaturity = block.timestamp - (s.stakeTime + maturityPeriod);
+        uint cycles = timeAfterMaturity / maturityPeriod;
+        s.stakeProfit = (s.stakedBalance + (interestInPercent * cycles)) / 100; 
+        s.stakedBalance += s.stakeProfit;
+    }
+        // s.stakedBalance += _amount;
+    require(s.stakedBalance >= _amount, "Amount exceeds BAT balance");
     s.stakedBalance -= _amount;
     boredApeToken.transfer(msg.sender, _amount);
     success = true;
