@@ -181,8 +181,8 @@
       ]
     },
     "C:\\Users\\HP\\Desktop\\Dev\\ERC20-Staking-Contract\\contracts\\BoredApeToken.sol": {
-      "lastModificationDate": 1647818532193,
-      "contentHash": "909a26d1dea1310e1634bf44c88f212b",
+      "lastModificationDate": 1648387079872,
+      "contentHash": "1a46020300c1f593811c326678726618",
       "sourceName": "contracts/BoredApeToken.sol",
       "solcConfig": {
         "version": "0.8.4",
@@ -436,8 +436,8 @@
       ]
     },
     "C:\\Users\\HP\\Desktop\\Dev\\ERC20-Staking-Contract\\contracts\\StakingContract.sol": {
-      "lastModificationDate": 1648203330127,
-      "contentHash": "9d47375f2067e73bfa931340da3ce310",
+      "lastModificationDate": 1648387548560,
+      "contentHash": "33efb9e33d9f5069e94f5f9a3ab31a91",
       "sourceName": "contracts/StakingContract.sol",
       "solcConfig": {
         "version": "0.8.4",
