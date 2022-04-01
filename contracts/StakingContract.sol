@@ -14,7 +14,7 @@ contract StakingContract{
        uint256 stakeBalance;
    }
 
-IERC20 boredApeToken = IERC20(0x4bf010f1b9beDA5450a8dD702ED602A104ff65EE);
+IERC20 boredApeToken = IERC20(0xB2b580ce436E6F77A5713D80887e14788Ef49c9A);
 IERC721 boredApeYachtClub = IERC721(0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D);
 uint256 constant calcDecimals = 1e10;
 uint256 stakeIndex = 1;
@@ -33,23 +33,24 @@ modifier onlyBoredApeOwners(){
 
 
 
-function Profit() public returns (uint256 _profit) {
+function stakeProfit() internal returns (uint256 _profit) {
     Stake storage s = stakes[msg.sender];
-    if(s.stakeTime > 0 && block.timestamp >= s.stakeTime + 3 days){
+    if(s.stakeTime > 0 && block.timestamp >= s.stakeTime + 3 minutes){
         s.stakeMaturity = true;
     }
     if(s.stakeMaturity){
-        uint256 timeAfterMaturity = block.timestamp - s.stakeTime;
-        uint256 cycles = timeAfterMaturity / 1 seconds;
+        uint256 timeBeforeMaturity = block.timestamp - s.stakeTime;
+        uint256 cycles = timeBeforeMaturity / 1 seconds;
         // interest per second 
-        _profit = (10 * calcDecimals * cycles)/(259200000); 
+        // _profit = (10 * calcDecimals * cycles)/(60*60*24*30*100 or 259200000); 
+        _profit = (10 * calcDecimals * cycles)/(30000); 
     }
 }
-function stake(uint256 _amount) public onlyBoredApeOwners{
+function stake(uint256 _amount) external onlyBoredApeOwners{
     require(boredApeToken.balanceOf(msg.sender) >= _amount, "Amount exceeds BAT balance");
     Stake storage s = stakes[msg.sender];
     boredApeToken.transferFrom(msg.sender, address(this), _amount);
-    uint256 profit = Profit();
+    uint256 profit = stakeProfit();
     s.stakeBalance += profit/calcDecimals;
         s.stakeBalance += _amount;
     emit tokenTransfer(msg.sender, address(this), _amount);
@@ -58,17 +59,18 @@ function stake(uint256 _amount) public onlyBoredApeOwners{
     s.stakeMaturity = false;
 }
 
-function viewStakeBalance() public view returns(uint256 _balance){
+function viewStakeBalance() external view returns(uint256 _balance){
     Stake storage s = stakes[msg.sender];
-    _balance = s.stakeBalance;
+    uint256 profit = stakeProfit();
+    _balance = s.stakeBalance + profit/calcDecimals;
 } 
 
-function withdraw(uint256 _amount) public returns(bool success){
+function withdraw(uint256 _amount) external returns(bool success){
     Stake storage s = stakes[msg.sender];
-    uint256 profit = Profit();
+    uint256 profit = stakeProfit();
     require(s.stakeMaturity == true, "Stake is not mature for withdrawal");
     s.stakeBalance += profit/calcDecimals;
-    require((s.stakeBalance) >= _amount, "Amount exceeds BAT balance");
+    require(s.stakeBalance >= _amount, "Amount exceeds BAT balance");
     s.stakeBalance -= _amount;
     boredApeToken.transfer(msg.sender, _amount);
     success = true;

@@ -1,4 +1,5 @@
 import { ethers } from "hardhat";
+// import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 
 async function deployContract() {
   // const BoredApeToken = await ethers.getContractFactory("BoredApeToken");
@@ -21,3 +22,19 @@ deployContract().catch((error) => {
   console.error(error);
   process.exit(1);
 });
+
+// const {
+//   DefenderRelaySigner,
+//   DefenderRelayProvider,
+// } = require("defender-relay-client/lib/ethers");
+// const { ethers } = require("ethers");
+
+// const credentials = { apiKey: YOUR_API_KEY, apiSecret: YOUR_API_SECRET };
+// const provider = new DefenderRelayProvider(credentials);
+// const signer = new DefenderRelaySigner(credentials, provider, {
+//   speed: "fast",
+// });
+
+// const erc20 = new ethers.Contract(ERC20_ADDRESS, ERC20_ABI, signer);
+// const tx = await erc20.transfer(beneficiary, (1e18).toString());
+// const mined = await tx.wait();
