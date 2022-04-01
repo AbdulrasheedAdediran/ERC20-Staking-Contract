@@ -18,9 +18,9 @@ async function deployContract() {
     "contracts/IERC721.sol:IERC721",
     BAYC_Address
   );
-  const StakingContractAddress = "0x74Cf9087AD26D541930BaC724B7ab21bA8F00a27";
-  const amountIn = 50000000;
-  const amountInContract = 500000000;
+  const StakingContractAddress = "0x70bDA08DBe07363968e9EE53d899dFE48560605B";
+  const amountIn = 100000;
+  const amountInContract = 1000000;
 
   console.log("BAT Contract Address:", BoredApeToken.address);
   // Forked Mainnet Address: 0xB2b580ce436E6F77A5713D80887e14788Ef49c9A
@@ -34,7 +34,7 @@ async function deployContract() {
   // await staking_contract.deployed();
 
   console.log("Staking Contract Address:", StakingContract.address);
-  // Staking Contract Address: 0x74Cf9087AD26D541930BaC724B7ab21bA8F00a27
+  // Staking Contract Address: 0x70bDA08DBe07363968e9EE53d899dFE48560605B
 
   // console.log(
   //   "Deployer's BAT Balance: ",
@@ -95,21 +95,21 @@ async function deployContract() {
   //   )}`
   // );
 
-  // console.log(
-  //   `Pranked user's BAT Balance Before Stake: ${await BoredApeToken.balanceOf(
-  //     BAYC_Holder
-  //   )}`
-  // );
+  console.log(
+    `Pranked user's BAT Balance Before Stake: ${await BoredApeToken.balanceOf(
+      BAYC_Holder
+    )}`
+  );
 
   console.log(
-    `Pranked User Granting Approval to stake 10000000... ${await BoredApeToken.connect(
+    `Pranked User Granting Approval to stake 100000... ${await BoredApeToken.connect(
       signer
-    ).approve(StakingContractAddress, 10000000)}`
+    ).approve(StakingContractAddress, 100000)}`
   );
   console.log(
-    `Pranked User Staking 10000000 ${await StakingContract.connect(
-      signer
-    ).stake(10000000)}`
+    `Pranked User Staking 100000 ${await StakingContract.connect(signer).stake(
+      100000
+    )}`
   );
 
   console.log(
@@ -134,8 +134,8 @@ async function deployContract() {
   );
 
   console.log(
-    `Withdrawing 10000000: ${await StakingContract.connect(signer).withdraw(
-      10000000
+    `Withdrawing 100020: ${await StakingContract.connect(signer).withdraw(
+      100020
     )}`
   );
 

@@ -114,16 +114,12 @@ export class StakingContract extends BaseContract {
       arg0: string,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, boolean, BigNumber] & {
-        stakeTime: BigNumber;
-        stakeMaturity: boolean;
-        stakeBalance: BigNumber;
-      }
+      [BigNumber, BigNumber] & { stakeTime: BigNumber; stakeBalance: BigNumber }
     >;
 
     viewStakeBalance(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+      overrides?: CallOverrides
+    ): Promise<[BigNumber] & { _balance: BigNumber }>;
 
     withdraw(
       _amount: BigNumberish,
@@ -140,16 +136,10 @@ export class StakingContract extends BaseContract {
     arg0: string,
     overrides?: CallOverrides
   ): Promise<
-    [BigNumber, boolean, BigNumber] & {
-      stakeTime: BigNumber;
-      stakeMaturity: boolean;
-      stakeBalance: BigNumber;
-    }
+    [BigNumber, BigNumber] & { stakeTime: BigNumber; stakeBalance: BigNumber }
   >;
 
-  viewStakeBalance(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  viewStakeBalance(overrides?: CallOverrides): Promise<BigNumber>;
 
   withdraw(
     _amount: BigNumberish,
@@ -163,11 +153,7 @@ export class StakingContract extends BaseContract {
       arg0: string,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, boolean, BigNumber] & {
-        stakeTime: BigNumber;
-        stakeMaturity: boolean;
-        stakeBalance: BigNumber;
-      }
+      [BigNumber, BigNumber] & { stakeTime: BigNumber; stakeBalance: BigNumber }
     >;
 
     viewStakeBalance(overrides?: CallOverrides): Promise<BigNumber>;
@@ -206,9 +192,7 @@ export class StakingContract extends BaseContract {
 
     stakes(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    viewStakeBalance(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    viewStakeBalance(overrides?: CallOverrides): Promise<BigNumber>;
 
     withdraw(
       _amount: BigNumberish,
@@ -227,9 +211,7 @@ export class StakingContract extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    viewStakeBalance(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    viewStakeBalance(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     withdraw(
       _amount: BigNumberish,
