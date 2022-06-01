@@ -12,15 +12,16 @@ async function deployContract() {
   // Forked Mainnet Address: 0x96F3Ce39Ad2BfDCf92C0F6E2C2CAbF83874660Fc
 
   const StakingContract = await ethers.getContractFactory("StakingContract");
-  const staking_contract = await StakingContract.deploy();
-  await staking_contract.deployed();
+  const deployedStakingContract = await StakingContract.deploy();
+  await deployedStakingContract.deployed();
 
-  console.log("Staking Contract Address:", staking_contract.address);
+  console.log("Staking Contract Address:", deployedStakingContract.address);
 }
 
 deployContract().catch((error) => {
   console.error(error);
-  process.exit(1);
+  throw new Error(error);
+  // process.exit(1);
 });
 
 // const {

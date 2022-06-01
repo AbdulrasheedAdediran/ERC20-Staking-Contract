@@ -33,6 +33,7 @@ async function deployContract() {
   // const staking_contract = await StakingContract.deploy(interestInPercent);
   // await staking_contract.deployed();
 
+  console.log("Deployer's Address:", deployer.address);
   console.log("Staking Contract Address:", StakingContract.address);
   // Staking Contract Address: 0x70bDA08DBe07363968e9EE53d899dFE48560605B
 
@@ -65,6 +66,7 @@ async function deployContract() {
   //   "0x1000000000000000000000",
   // ]);
   // console.log(`Pranked user's BAT Balance Before Drop: ${await BoredApeToken.balanceOf(BAYC_Holder)}`)
+  console.log("Signer after impersonation: ", signer.address);
   console.log(
     `Pranked user's BAYC Balance: ${await BoredApeYachtClub.balanceOf(
       BAYC_Holder
@@ -135,7 +137,7 @@ async function deployContract() {
 
   console.log(
     `Withdrawing 100020: ${await StakingContract.connect(signer).withdraw(
-      100020
+      1000
     )}`
   );
 

@@ -2,3 +2,8 @@ node
 node_modules
 Notes.md
 .env
+typechain
+
+#Hardhat files
+cache
+artifacts
