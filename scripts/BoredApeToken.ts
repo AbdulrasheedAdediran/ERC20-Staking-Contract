@@ -1,15 +1,16 @@
 import { ethers } from "hardhat";
-// import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 
 async function deployContract() {
-  // const BoredApeToken = await ethers.getContractFactory("BoredApeToken");
-  // const bored_ape_token = await BoredApeToken.deploy("Bored Ape Token", "BAT");
-  // await bored_ape_token.deployed();
-  // console.log("Staking Contract Address:", bored_ape_token.address);
+  const totalSupply = ethers.utils.parseEther("10000000000");
+  const adminAccount = process.env.ADMIN;
 
-  // console.log("BAT Contract Address:", bored_ape_token.address);
-  // BAT Contract Address Rinkeby: 0x234d11e2382C47283FBBBE42835676058009BF18
-  // Forked Mainnet Address: 0x96F3Ce39Ad2BfDCf92C0F6E2C2CAbF83874660Fc
+  const BATContractFactory = await ethers.getContractFactory("BoredApeToken");
+  const BATContract = await BATContractFactory.deploy(
+    adminAccount,
+    totalSupply
+  );
+  await BATContract.deployed();
+  console.log(`Bored Ape Token Contract Address: ${BATContract.address}`);
 
   const StakingContract = await ethers.getContractFactory("StakingContract");
   const deployedStakingContract = await StakingContract.deploy();

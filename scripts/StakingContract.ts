@@ -1,28 +1,28 @@
 import { ethers, network } from "hardhat";
 
 async function deployContract() {
-  const adminAccount = "0xe66904a5318f27880bf1d20D77Ffa8FBdaC5E5E7";
+  const adminAccount = process.env.ADMIN;
   const [deployer] = await ethers.getSigners();
   // Account to impersonate: 0x2F8Cb25737f469A3479Dbf3cEdf428A3D9900d39
-  const BAYC_Holder = "0x2F8Cb25737f469A3479Dbf3cEdf428A3D9900d39";
+  const baycHolder = "0x2F8Cb25737f469A3479Dbf3cEdf428A3D9900d39";
   console.log("Deployer address: ", deployer.address);
   // Bored Ape Token Address
-  const BAT_Address = "0xB2b580ce436E6F77A5713D80887e14788Ef49c9A";
+  const batAddress = "0xB2b580ce436E6F77A5713D80887e14788Ef49c9A";
   // Bored Apes NFT Address
-  const BAYC_Address = "0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D";
-  const BoredApeToken = await ethers.getContractAt(
-    "BoredApeToken",
-    BAT_Address
+  const baycAddress = "0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D";
+  const batContractInstance = await ethers.getContractAt(
+    "batContractInstance",
+    batAddress
   );
   const BoredApeYachtClub = await ethers.getContractAt(
     "contracts/IERC721.sol:IERC721",
-    BAYC_Address
+    baycAddress
   );
   const StakingContractAddress = "0x70bDA08DBe07363968e9EE53d899dFE48560605B";
   const amountIn = 100000;
   const amountInContract = 1000000;
 
-  console.log("BAT Contract Address:", BoredApeToken.address);
+  console.log("BAT Contract Address:", batContractInstance.address);
   // Forked Mainnet Address: 0xB2b580ce436E6F77A5713D80887e14788Ef49c9A
 
   const StakingContract = await ethers.getContractAt(
@@ -39,7 +39,7 @@ async function deployContract() {
 
   // console.log(
   //   "Deployer's BAT Balance: ",
-  //   await BoredApeToken.balanceOf(deployer.address)
+  //   await batContractInstance.balanceOf(deployer.address)
   // );
   console.log(
     `Deployer's BAT mainnet balance is ${await ethers.provider.getBalance(
@@ -53,9 +53,10 @@ async function deployContract() {
   // );
 
   // @ts-ignore
+  // eslint-disable-next-line no-undef
   await hre.network.provider.request({
     method: "hardhat_impersonateAccount",
-    params: [BAYC_Holder],
+    params: [baycHolder],
   });
 
   const signer = await ethers.getSigner(
@@ -65,22 +66,22 @@ async function deployContract() {
   //   "0xe66904a5318f27880bf1d20D77Ffa8FBdaC5E5E7",
   //   "0x1000000000000000000000",
   // ]);
-  // console.log(`Pranked user's BAT Balance Before Drop: ${await BoredApeToken.balanceOf(BAYC_Holder)}`)
+  // console.log(`Pranked user's BAT Balance Before Drop: ${await batContractInstance.balanceOf(baycHolder)}`)
   console.log("Signer after impersonation: ", signer.address);
   console.log(
     `Pranked user's BAYC Balance: ${await BoredApeYachtClub.balanceOf(
-      BAYC_Holder
+      baycHolder
     )}`
   );
 
   // console.log(
-  //   `Transferring ${amountIn} BAT to pranked user${await BoredApeToken.transfer(
-  //     BAYC_Holder,
+  //   `Transferring ${amountIn} BAT to pranked user${await batContractInstance.transfer(
+  //     baycHolder,
   //     amountIn
   //   )}`
   // );
   console.log(
-    `Transferring ${amountInContract} BAT to Staking Contract ${await BoredApeToken.transfer(
+    `Transferring ${amountInContract} BAT to Staking Contract ${await batContractInstance.transfer(
       StakingContract.address,
       amountInContract
     )}`
@@ -88,25 +89,25 @@ async function deployContract() {
 
   console.log(
     "Deployer's BAT Balance After Drop: ",
-    await BoredApeToken.balanceOf(deployer.address)
+    await batContractInstance.balanceOf(deployer.address)
   );
 
   // console.log(
-  //   `Pranked user's BAT Balance After Drop: ${await BoredApeToken.balanceOf(
-  //     BAYC_Holder
+  //   `Pranked user's BAT Balance After Drop: ${await batContractInstance.balanceOf(
+  //     baycHolder
   //   )}`
   // );
 
   console.log(
-    `Pranked user's BAT Balance Before Stake: ${await BoredApeToken.balanceOf(
-      BAYC_Holder
+    `Pranked user's BAT Balance Before Stake: ${await batContractInstance.balanceOf(
+      baycHolder
     )}`
   );
 
   console.log(
-    `Pranked User Granting Approval to stake 100000... ${await BoredApeToken.connect(
-      signer
-    ).approve(StakingContractAddress, 100000)}`
+    `Pranked User Granting Approval to stake 100000... ${await batContractInstance
+      .connect(signer)
+      .approve(StakingContractAddress, 100000)}`
   );
   console.log(
     `Pranked User Staking 100000 ${await StakingContract.connect(signer).stake(
@@ -115,8 +116,8 @@ async function deployContract() {
   );
 
   console.log(
-    `Pranked User's BAT Balance After Stake: ${await BoredApeToken.balanceOf(
-      BAYC_Holder
+    `Pranked User's BAT Balance After Stake: ${await batContractInstance.balanceOf(
+      baycHolder
     )}`
   );
 
@@ -147,13 +148,17 @@ async function deployContract() {
     ).viewStakeBalance()}`
   );
   console.log(
-    `Pranked User's BAT Balance After Withdrawal: ${await BoredApeToken.balanceOf(
-      BAYC_Holder
+    `Pranked User's BAT Balance After Withdrawal: ${await batContractInstance.balanceOf(
+      baycHolder
     )}`
   );
 }
 
-deployContract().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+deployContract()
+  // eslint-disable-next-line no-process-exit
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error(error);
+    // eslint-disable-next-line no-process-exit
+    process.exit(1);
+  });

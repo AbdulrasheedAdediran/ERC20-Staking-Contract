@@ -1,77 +1,114 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.4;
+pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "./IERC20.sol";
+import "./IERC721.sol";
 
 contract StakingContract {
     struct Stake {
-        uint256 stakeTime;
+        address staker;
+        bool activeStake;
+        uint88 stakeTime;
         uint256 stakeBalance;
     }
 
-    IERC20 boredApeToken;
-    IERC721 boredApeYachtClub;
+    IERC20 public immutable boredApeToken;
+    IERC721 public immutable boredApeYachtClub;
 
-    constructor() {
-        boredApeToken = IERC20(0x234d11e2382C47283FBBBE42835676058009BF18);
-        boredApeYachtClub = IERC721(0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D);
-    }
+    uint256 public constant MINIMUM_STAKE = 10e18;
 
-    uint256 constant DECIMALS = 1e10;
     mapping(address => Stake) public stakes;
-    event tokenTransfer(address _from, address _to, uint256 _amount);
+
+    /// Sender does not have an active stake
+    error NoActiveStakeFound();
+
+    /// Sender does not own a Bored Ape Yatch Club NFT
+    error MustOwnBoredApeNFT();
+
+    /// Sender's stake amount is less than the minimum acceptable amount
+    error StakeTooLow();
+
+    event StakeDeposit(address _from, uint256 _amount);
+    event StakeWithdrawal(address _from, uint256 _amount);
+
+    /// Asserts that only users who own at least one Bored Ape Yatch Club NFT can stake
     modifier onlyBoredApeOwners() {
-        require(
-            boredApeYachtClub.balanceOf(msg.sender) >= 1,
-            "Sorry, only Bored Ape NFT owners can stake"
-        );
+        if (boredApeYachtClub.balanceOf(msg.sender) < 1)
+            revert MustOwnBoredApeNFT();
         _;
     }
 
-    function stakeProfit() internal view returns (uint256 _profit) {
+    constructor(address _batAddress, address _baycAddress) {
+        boredApeToken = IERC20(_batAddress);
+        boredApeYachtClub = IERC721(_baycAddress);
+        // boredApeToken = IERC20(0x234d11e2382C47283FBBBE42835676058009BF18); _batAddress
+        // boredApeYachtClub = IERC721(0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D); _baycAddress
+    }
+
+    function stake(uint256 _amount)
+        external
+        onlyBoredApeOwners
+        returns (bool success)
+    {
         Stake storage s = stakes[msg.sender];
-        if (s.stakeTime > 0 && block.timestamp >= s.stakeTime + 259200) {
-            uint256 timeBeforeMaturity = block.timestamp - s.stakeTime;
-            uint256 cycles = timeBeforeMaturity / 1 seconds;
-            // interest per second
-            // _profit = (10 * DECIMALS * cycles)/(60*60*24*30*100 or 259200000);
-            _profit = (10 * DECIMALS * cycles) / 259200000;
+        if (_amount < MINIMUM_STAKE) revert StakeTooLow();
+        assert(boredApeToken.transferFrom(msg.sender, address(this), _amount));
+        if (s.activeStake) {
+            uint256 profit = stakeProfit();
+            s.stakeBalance += _amount + profit;
+        } else {
+            s.staker = msg.sender;
+            s.stakeBalance += _amount;
+            s.activeStake = true;
         }
+        s.stakeTime = uint88(block.timestamp);
+
+        emit StakeDeposit(msg.sender, _amount);
+
+        success = true;
     }
 
-    function stake(uint256 _amount) external onlyBoredApeOwners {
+    /**
+     * @notice Withdraws sender's total stake balance
+     * Returns a boolean to indicate transaction status
+     */
+    function withdraw() external returns (bool success) {
         Stake storage s = stakes[msg.sender];
-        boredApeToken.transferFrom(msg.sender, address(this), _amount);
+        if (!s.activeStake) revert NoActiveStakeFound();
         uint256 profit = stakeProfit();
-        s.stakeBalance += _amount;
-        s.stakeBalance += profit / DECIMALS;
-        emit tokenTransfer(msg.sender, address(this), _amount);
-        s.stakeTime = block.timestamp;
+        uint256 totalStakeBalance = s.stakeBalance + profit;
+        s.stakeBalance -= totalStakeBalance;
+        s.activeStake = false;
+        assert(boredApeToken.transfer(msg.sender, totalStakeBalance));
+        emit StakeWithdrawal(msg.sender, totalStakeBalance);
+        success = true;
     }
 
+    /**
+     * @notice Returns the sender's total stake balance
+     */
     function viewStakeBalance() external view returns (uint256 _balance) {
         Stake storage s = stakes[msg.sender];
+        if (!s.activeStake) revert NoActiveStakeFound();
         uint256 profit = stakeProfit();
-        _balance = s.stakeBalance + profit / DECIMALS;
+        _balance = s.stakeBalance + profit;
     }
 
-    function withdraw(uint256 _amount) external returns (bool success) {
+    /**
+     * Computes the stakers profit per second
+     * Returns the stakers profit accrued after stake maturity
+     * Returns 0 if stake is not yet matured for autocompounding
+     */
+    function stakeProfit() internal view returns (uint256 _profit) {
         Stake storage s = stakes[msg.sender];
-        if (s.stakeTime > 0 && block.timestamp >= s.stakeTime + 259200) {
-            uint256 profit = stakeProfit();
-            s.stakeBalance += profit / DECIMALS;
-            require(s.stakeBalance >= _amount, "Amount exceeds BAT balance");
-            s.stakeBalance -= _amount;
+        uint256 minimumCycle = 259200 seconds; // 3 days
+        uint256 stakeMaturity = block.timestamp - s.stakeTime;
+        uint256 cycles = stakeMaturity / 1 seconds;
+        if (block.timestamp >= s.stakeTime + minimumCycle) {
+            // _profit = (10% * s.stakeBalance * cycles)/(60*60*24*30*100 or 259200000);
+            _profit = (10 * s.stakeBalance * cycles) / 259200000;
         } else {
-            require(s.stakeBalance >= _amount, "Amount exceeds BAT balance");
-            s.stakeBalance -= _amount;
+            _profit = 0;
         }
-        boredApeToken.transfer(msg.sender, _amount);
-        success = true;
-        emit tokenTransfer(address(this), msg.sender, _amount);
-        s.stakeTime = block.timestamp;
     }
 }
