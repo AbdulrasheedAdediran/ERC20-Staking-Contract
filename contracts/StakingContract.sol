@@ -41,8 +41,6 @@ contract StakingContract {
     constructor(address _batAddress, address _baycAddress) {
         boredApeToken = IERC20(_batAddress);
         boredApeYachtClub = IERC721(_baycAddress);
-        // boredApeToken = IERC20(0x234d11e2382C47283FBBBE42835676058009BF18); _batAddress
-        // boredApeYachtClub = IERC721(0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D); _baycAddress
     }
 
     function stake(uint256 _amount)
@@ -104,7 +102,7 @@ contract StakingContract {
         uint256 minimumCycle = 259200 seconds; // 3 days
         uint256 stakeMaturity = block.timestamp - s.stakeTime;
         uint256 cycles = stakeMaturity / 1 seconds;
-        if (block.timestamp >= s.stakeTime + minimumCycle) {
+        if (block.timestamp >= (s.stakeTime + minimumCycle)) {
             // _profit = (10% * s.stakeBalance * cycles)/(60*60*24*30*100 or 259200000);
             _profit = (10 * s.stakeBalance * cycles) / 259200000;
         } else {
